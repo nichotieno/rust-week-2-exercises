@@ -33,8 +33,9 @@ pub fn bytes_to_hex(bytes: &[u8]) -> String {
          .collect()
 }
 
+//Implement conversion of hex string to bytes vector
 pub fn hex_to_bytes(hex: &str) -> Result<Vec<u8>, hex::FromHexError> {
-    // TODO: Implement conversion of hex string to bytes vector
+    hex::decode(hex)
 }
 
 pub fn swap_endian_u32(num: u32) -> [u8; 4] {

@@ -38,12 +38,76 @@ pub fn hex_to_bytes(hex: &str) -> Result<Vec<u8>, hex::FromHexError> {
     hex::decode(hex)
 }
 
+//Implement little-endian byte swap for u32
 pub fn swap_endian_u32(num: u32) -> [u8; 4] {
-    // TODO: Implement little-endian byte swap for u32
+    num.swap_bytes().to_be_bytes()
 }
 
+//Parse input string to u64, return error string if invalid
 pub fn parse_satoshis(input: &str) -> Result<u64, String> {
-    // TODO: Parse input string to u64, return error string if invalid
+    if input.is_empty() {
+        return Err("Input string cannot be empty.".to_string());
+    }
+
+    let trimmed_input = input.trim();
+    let parts: Vec<&str> = trimmed_input.split('.').collect();
+
+    let (integer_part_str, fractional_part_str) = match parts.len() {
+        1 => (parts[0], ""),
+        2 => (parts[0], parts[1]),
+        _ => return Err("Too many decimal points.".to_string()),
+    };
+
+    // Validate characters
+    for c in integer_part_str.chars() {
+        if !c.is_ascii_digit() {
+            return Err(format!("Invalid character found in amount: '{}'", c));
+        }
+    }
+    for c in fractional_part_str.chars() {
+        if !c.is_ascii_digit() {
+            return Err(format!("Invalid character found in amount: '{}'", c));
+        }
+    }
+
+    if fractional_part_str.len() > 8 {
+        return Err("Too many decimal places (max 8 supported).".to_string());
+    }
+
+    let mut total_satoshis: u64 = 0;
+
+    // Parse integer part
+    if !integer_part_str.is_empty() {
+        let integer_btc = integer_part_str
+            .parse::<u64>()
+            .map_err(|_| "Invalid number format.".to_string())?;
+
+        // Check for overflow before multiplication
+        if integer_btc > u64::MAX / 100_000_000 {
+            return Err("Value too large.".to_string());
+        }
+        total_satoshis = integer_btc * 100_000_000;
+    }
+
+    // Parse fractional part
+    if !fractional_part_str.is_empty() {
+        let mut fractional_btc = fractional_part_str
+            .parse::<u64>()
+            .map_err(|_| "Invalid number format.".to_string())?;
+
+        let num_zeros_to_pad = 8 - fractional_part_str.len();
+        for _ in 0..num_zeros_to_pad {
+            fractional_btc *= 10;
+        }
+
+        // Check for overflow before addition
+        if u64::MAX - total_satoshis < fractional_btc {
+            return Err("Value too large.".to_string());
+        }
+        total_satoshis += fractional_btc;
+    }
+
+    Ok(total_satoshis)
 }
 
 pub enum ScriptType {

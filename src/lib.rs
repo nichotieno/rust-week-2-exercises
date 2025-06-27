@@ -157,16 +157,22 @@ pub struct TestWallet {
 
 impl Wallet for TestWallet {
     fn balance(&self) -> u64 {
-        // TODO: Return the wallet's confirmed balance
+        self.confirmed
     }
 }
 
 pub fn apply_fee(balance: &mut u64, fee: u64) {
-    // TODO: Subtract fee from mutable balance reference
+    if *balance >= fee {
+        *balance -= fee;
+    } else {
+        eprintln!("Warning: Attempted to subtract fee ({}) greater than balance ({})", fee, *balance);
+        *balance = 0; // Or keep it as is, depending on desired behavior
+    }
 }
 
+//Return formatted string including the txid for display or logging
 pub fn move_txid(txid: String) -> String {
-    // TODO: Return formatted string including the txid for display or logging
+    format!("Transaction ID: {}", txid)
 }
 
 //Add necessary derive traits

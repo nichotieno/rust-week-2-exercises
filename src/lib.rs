@@ -18,8 +18,11 @@ pub fn decode_hex(hex_str: &str) -> Result<Vec<u8>, String> {
     Ok(bytes)
 }
 
+// Reverse the byte order of input slice and return as Vec<u8>
 pub fn to_big_endian(bytes: &[u8]) -> Vec<u8> {
-    // TODO: Reverse the byte order of input slice and return as Vec<u8>
+    let mut reversed_bytes = bytes.to_vec();
+    reversed_bytes.reverse();
+    reversed_bytes
 }
 
 pub fn bytes_to_hex(bytes: &[u8]) -> String {

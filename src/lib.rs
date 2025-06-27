@@ -140,11 +140,27 @@ pub fn classify_script(script: &[u8]) -> ScriptType {
     ScriptType::Unknown
 }
 
-// TODO: complete Outpoint tuple struct
+// complete Outpoint tuple struct
+#[derive(Debug, PartialEq, Eq, Clone, Copy, Hash)]
 pub struct Outpoint();
 
+// Return the pushdata portion of the script slice (assumes pushdata starts at index 2)
 pub fn read_pushdata(script: &[u8]) -> &[u8] {
-    // TODO: Return the pushdata portion of the script slice (assumes pushdata starts at index 2)
+    if script.len() < 3 {
+        return &[];
+    }
+
+    let pushdata_len_byte = script[1];
+
+    let pushdata_length = pushdata_len_byte as usize;
+
+    let start_index = 2;
+
+    if start_index + pushdata_length > script.len() {
+        return &[];
+    }
+
+    &script[start_index..start_index + pushdata_length]
 }
 
 pub trait Wallet {

@@ -141,8 +141,8 @@ pub fn classify_script(script: &[u8]) -> ScriptType {
 }
 
 // complete Outpoint tuple struct
-#[derive(Debug, PartialEq, Eq, Clone, Copy, Hash)]
-pub struct Outpoint();
+#[derive(Debug, PartialEq, Eq, Clone, Hash)]
+pub struct Outpoint(pub String, pub u32);
 
 // Return the pushdata portion of the script slice (assumes pushdata starts at index 2)
 pub fn read_pushdata(script: &[u8]) -> &[u8] {
@@ -162,7 +162,6 @@ pub fn read_pushdata(script: &[u8]) -> &[u8] {
 
     &script[start_index..start_index + pushdata_length]
 }
-
 pub trait Wallet {
     fn balance(&self) -> u64;
 }

@@ -1,7 +1,21 @@
 use hex::{decode, encode};
 
 pub fn decode_hex(hex_str: &str) -> Result<Vec<u8>, String> {
-    // TODO: Decode hex string into Vec<u8>, return error string on failure
+    if hex_str.len() % 2 != 0 {
+        return Err("Hex string must have an even number of characters".to_string());
+    }
+
+    let mut bytes = Vec::with_capacity(hex_str.len() / 2);
+
+    for i in (0..hex_str.len()).step_by(2) {
+        let byte_str = &hex_str[i..i + 2];
+        match u8::from_str_radix(byte_str, 16) {
+            Ok(byte) => bytes.push(byte),
+            Err(_) => return Err(format!("Invalid hex character sequence: '{}'", byte_str)),
+        }
+    }
+
+    Ok(bytes)
 }
 
 pub fn to_big_endian(bytes: &[u8]) -> Vec<u8> {

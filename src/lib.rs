@@ -169,16 +169,22 @@ pub fn move_txid(txid: String) -> String {
     // TODO: Return formatted string including the txid for display or logging
 }
 
-// TODO: Add necessary derive traits
+//Add necessary derive traits
+#[derive(Debug, PartialEq, Eq, Clone, Copy)]
 pub enum Opcode {
     OpChecksig,
     OpDup,
     OpInvalid,
 }
 
+//Implement mapping from byte to Opcode variant
 impl Opcode {
     pub fn from_byte(byte: u8) -> Result<Self, String> {
-        // TODO: Implement mapping from byte to Opcode variant
+        match byte {
+            0xAC => Ok(Opcode::OpChecksig),
+            0x76 => Ok(Opcode::OpDup),
+            _ => Err(format!("Unknown opcode byte: 0x{:02x}", byte)),
+        }
     }
 }
 

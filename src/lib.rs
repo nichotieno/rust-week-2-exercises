@@ -116,8 +116,28 @@ pub enum ScriptType {
     Unknown,
 }
 
+// Match script pattern and return corresponding ScriptType
 pub fn classify_script(script: &[u8]) -> ScriptType {
-    // TODO: Match script pattern and return corresponding ScriptType
+    if script.len() == 25
+        && script[0] == 0x76 // OP_DUP
+        && script[1] == 0xA9 // OP_HASH160
+        && script[2] == 0x14 // PUSHDATA1 20 bytes
+        && script[23] == 0x88 // OP_EQUALVERIFY
+        && script[24] == 0xAC // OP_CHECKSIG
+    {
+        return ScriptType::P2PKH;
+    }
+
+    // P2WPKH script pattern: OP_0 <20-byte-pubkey-hash>
+    // Hex: 00 14 {20-byte-hash}
+    if script.len() == 22
+        && script[0] == 0x00 // OP_0 (witness version 0)
+        && script[1] == 0x14 // PUSHDATA1 20 bytes
+    {
+        return ScriptType::P2WPKH;
+    }
+
+    ScriptType::Unknown
 }
 
 // TODO: complete Outpoint tuple struct
